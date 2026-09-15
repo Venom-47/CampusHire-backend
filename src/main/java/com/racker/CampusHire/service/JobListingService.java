@@ -15,6 +15,6 @@ public interface JobListingService {
 
     JobListingRes getJobById(Long id);
 
-    JobListingRes toogleJobStatus(Long id, String status);
+    JobListingRes toggleJobStatus(Long id, String status);
 
 }

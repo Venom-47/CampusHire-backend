@@ -77,7 +77,7 @@ public class JobListingServiceImpl implements JobListingService {
     }
 
     @Override
-    public JobListingRes toogleJobStatus(Long id, String status) {
+    public JobListingRes toggleJobStatus(Long id, String status) {
 
         log.info("Updating status for id: {} to {}", id, status);
 
