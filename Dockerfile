@@ -3,10 +3,10 @@ FROM eclipse-temurin:25-jre
 
 WORKDIR /app
 
-# Step 2: Copy the compiled JAR
-COPY target/CampusPlacmentTracker-0.0.1-SNAPSHOT.jar app.jar
+# Step 2: Copy the compiled JAR (using wildcard *.jar)
+COPY target/*.jar app.jar
 
-# Step 3: Expose Spring Boot's port
+# Step 3: Expose Spring Boot port
 EXPOSE 8080
 
 # Step 4: Run the application
