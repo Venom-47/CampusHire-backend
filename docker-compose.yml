@@ -3,6 +3,8 @@ services:
     image: postgres:16.2
     container_name: campus_hire_postgres
     restart: always
+    ports:
+      - "${POSTGRES_PORT}:5432"
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-campus_hire}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -24,6 +26,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-campus_hire}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      JWT_SECRET: ${JWT_SECRET:-mySecret}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
     depends_on:
       - postgres
     networks:
