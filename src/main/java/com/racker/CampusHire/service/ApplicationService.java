@@ -6,11 +6,12 @@ import com.racker.CampusHire.dto.response.ApplicationRes;
 import com.racker.CampusHire.entity.Application;
 import com.racker.CampusHire.entity.ApplicationStatus;
 
+import java.security.Principal;
 import java.util.List;
 
 public interface ApplicationService {
 
-    ApplicationRes applyForJob(ApplicationReq req);
+    ApplicationRes applyForJob(ApplicationReq req, String studentEmail);
 
     List<ApplicationRes> getMyApplications(String studentEmail);
 

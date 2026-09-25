@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,14 +23,14 @@ public class ApplicationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApplicationRes applyForJob(@RequestBody ApplicationReq applicationReq) {
-        return applicationService.applyForJob(applicationReq);
+    public ApplicationRes applyForJob(@RequestBody ApplicationReq applicationReq, Principal principal) {
+        return applicationService.applyForJob(applicationReq, principal.getName());
     }
 
     @GetMapping("/my")
     @ResponseStatus(HttpStatus.OK)
-    public List<ApplicationRes> getMyApplications(@RequestParam String email) {
-        return applicationService.getMyApplications(email);
+    public List<ApplicationRes> getMyApplications(Principal principal) {
+        return applicationService.getMyApplications(principal.getName());
     }
 
     @GetMapping("/job/{jobId}")

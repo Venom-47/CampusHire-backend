@@ -7,17 +7,20 @@ import com.racker.CampusHire.dto.response.JobListingRes;
 import com.racker.CampusHire.entity.Application;
 import com.racker.CampusHire.entity.ApplicationStatus;
 import com.racker.CampusHire.entity.JobListing;
+import com.racker.CampusHire.entity.User;
 import com.racker.CampusHire.exception.DeadlinePassedException;
 import com.racker.CampusHire.exception.DuplicateApplicationException;
 import com.racker.CampusHire.exception.IneligibleStudentException;
 import com.racker.CampusHire.exception.ResourceNotFoundException;
 import com.racker.CampusHire.repository.ApplicationRepo;
 import com.racker.CampusHire.repository.JobListingRepo;
+import com.racker.CampusHire.repository.UserRepo;
 import com.racker.CampusHire.service.ApplicationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,12 +32,19 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     private final ApplicationRepo applicationRepo;
     private final JobListingRepo jobListingRepo;
+    private final UserRepo userRepo;
 
     @Override
-    public ApplicationRes applyForJob(ApplicationReq req) {
+    public ApplicationRes applyForJob(ApplicationReq req, String studentEmail) {
 
-        log.info("Student {} ({}) applying for Job id: {}",req.getStudentName(),req.getStudentEmail(),req.getJobId());
+        log.info("Student {} ({}) applying for Job id: {}",req.getStudentName(),studentEmail,req.getJobId());
 
+        User user = userRepo.findByEmail(studentEmail)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found with name: " + studentEmail));
+
+        if(user.getCgpa() == null){
+            throw new IneligibleStudentException("Your profile does not have a registered CGPA. Please contact TPO.");
+        }
         JobListing job = jobListingRepo.findById(req.getJobId())
             .orElseThrow(() -> new ResourceNotFoundException("Job listing not found with id: " + req.getJobId()));
 
@@ -50,27 +60,27 @@ public class ApplicationServiceImpl implements ApplicationService {
             throw new DeadlinePassedException("The deadline for this job was: " + job.getDeadline());
         }
 
-        if(applicationRepo.existsByJobListingIdAndStudentEmail(req.getJobId(), req.getStudentEmail())) {
-            log.warn("Application rejected: Duplicate application by {} for job id: {}", req.getStudentName(), req.getJobId());
+        if(applicationRepo.existsByJobListingIdAndStudentEmail(req.getJobId(), studentEmail)) {
+            log.warn("Application rejected: Duplicate application by {} for job id: {}", user.getFullName(), req.getJobId());
 
             throw new DuplicateApplicationException("You have already applied for this job.");
         }
 
-        if(req.getCgpa() < job.getMinCgpa()){
-            log.warn("Application rejected: Ineligible CGPA {} for required {}",req.getCgpa(),job.getMinCgpa());
+        if(user.getCgpa() < job.getMinCgpa()){
+            log.warn("Application rejected: Ineligible CGPA {} for required {}",user.getCgpa(),job.getMinCgpa());
             throw new IneligibleStudentException(String.format(
                 "Your CGPA (%.2f) does not meet the minimum required CGPA (%.2f) for %s.",
-                req.getCgpa(),job.getMinCgpa(),job.getCompanyName()
+                user.getCgpa(),job.getMinCgpa(),job.getCompanyName()
             ));
         }
 
         Application application = Application.builder()
             .jobListing(job)
-            .studentName(req.getStudentName())
-            .studentEmail(req.getStudentEmail())
-            .uid(req.getUid())
-            .department(req.getDepartment())
-            .cgpa(req.getCgpa())
+            .studentName(user.getFullName())
+            .studentEmail(user.getEmail())
+            .uid(user.getUid())
+            .department(user.getDepartment())
+            .cgpa(user.getCgpa())
             .status(ApplicationStatus.APPLIED)
             .resumeUrl(req.getResumeUrl())
             .appliedAt(LocalDateTime.now())

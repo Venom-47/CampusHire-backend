@@ -40,7 +40,8 @@ public class Application {
     private String uid;
 
     @Column(nullable = false)
-    private String department;
+    @Enumerated(EnumType.STRING)
+    private Department department;
 
     @Column(nullable = false)
     private double cgpa;

@@ -1,6 +1,7 @@
 package com.racker.CampusHire.dto.response;
 
 import com.racker.CampusHire.entity.ApplicationStatus;
+import com.racker.CampusHire.entity.Department;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -24,7 +25,7 @@ public class ApplicationRes {
     private String studentName;
     private String studentEmail;
     private String uid;
-    private String department;
+    private Department department;
     private double cgpa;
 
     private ApplicationStatus status;
