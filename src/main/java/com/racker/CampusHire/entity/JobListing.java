@@ -46,5 +46,9 @@ public class JobListing {
 
     private String description;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "posted_by_id")
+    private User postedBy;
+
     private LocalDateTime createdAt;
 }

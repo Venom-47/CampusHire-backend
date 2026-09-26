@@ -3,8 +3,10 @@ package com.racker.CampusHire.service.impl;
 import com.racker.CampusHire.dto.request.JobListingReq;
 import com.racker.CampusHire.dto.response.JobListingRes;
 import com.racker.CampusHire.entity.JobListing;
+import com.racker.CampusHire.entity.User;
 import com.racker.CampusHire.exception.ResourceNotFoundException;
 import com.racker.CampusHire.repository.JobListingRepo;
+import com.racker.CampusHire.repository.UserRepo;
 import com.racker.CampusHire.service.JobListingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +23,15 @@ import java.util.stream.Collectors;
 public class JobListingServiceImpl implements JobListingService {
 
     private final JobListingRepo jobListingRepo;
+    private final UserRepo userRepo;
 
     @Override
-    public JobListingRes createJob(JobListingReq req) {
+    public JobListingRes createJob(JobListingReq req, String tpoEmail) {
 
-        log.info("Creating new job drive for company: {} - role: {}", req.getCompanyName(), req.getRoleTitle());
+        log.info("Creating new job drive for company: {} by tpo: {}", req.getCompanyName(), tpoEmail);
+
+        User tpo = userRepo.findByEmail(tpoEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("TPO not found with email: " + tpoEmail));
 
         JobListing jobListing = JobListing.builder()
                 .companyName(req.getCompanyName())
@@ -38,6 +44,7 @@ public class JobListingServiceImpl implements JobListingService {
                 .location(req.getLocation())
                 .description(req.getDescription())
                 .status("OPEN")
+                .postedBy(tpo)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -84,13 +91,24 @@ public class JobListingServiceImpl implements JobListingService {
         JobListing job = jobListingRepo.findById(id)
                 .orElseThrow(()-> new ResourceNotFoundException("Job listing not found with id: " + id));
 
-        job.setStatus(status);
+        job.setStatus(status.toUpperCase());
         JobListing updatedJob = jobListingRepo.save(job);
 
         return mapToResponseDto(updatedJob);
     }
 
     private JobListingRes mapToResponseDto(JobListing entity) {
+
+        String postedByName = "TPO Cell";
+        String postedByEmail = null;
+
+        if (entity.getPostedBy() != null) {
+            if(entity.getPostedBy().getFullName() != null) {
+                postedByName = entity.getPostedBy().getFullName();
+            }
+            postedByEmail = entity.getPostedBy().getEmail();
+        }
+
         return JobListingRes.builder()
                 .id(entity.getId())
                 .companyName(entity.getCompanyName())
@@ -103,6 +121,8 @@ public class JobListingServiceImpl implements JobListingService {
                 .location(entity.getLocation())
                 .description(entity.getDescription())
                 .status(entity.getStatus())
+                .postedByName(postedByName)
+                .postedByEmail(postedByEmail)
                 .createdAt(entity.getCreatedAt())
                 .build();
     }

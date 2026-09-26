@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface JobListingService {
 
-    JobListingRes createJob(JobListingReq req);
+    JobListingRes createJob(JobListingReq req, String topEmail);
 
     List<JobListingRes> getAllOpenJobs();
 

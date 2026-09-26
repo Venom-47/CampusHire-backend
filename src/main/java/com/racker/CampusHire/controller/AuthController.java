@@ -4,6 +4,7 @@ import com.racker.CampusHire.dto.request.LoginReq;
 import com.racker.CampusHire.dto.request.RegisterReq;
 import com.racker.CampusHire.dto.response.AuthRes;
 import com.racker.CampusHire.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +19,13 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public AuthRes register(@RequestBody RegisterReq req){
+    public AuthRes register(@Valid @RequestBody RegisterReq req){
         return authService.register(req);
     }
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public AuthRes login(@RequestBody LoginReq req){
+    public AuthRes login(@Valid @RequestBody LoginReq req){
         return authService.login(req);
     }
 }

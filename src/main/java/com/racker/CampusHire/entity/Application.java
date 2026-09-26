@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
     uniqueConstraints = {
         @UniqueConstraint(
             name = "uk_job_student",
-            columnNames = {"job_id", "student_email"}
+            columnNames = {"job_id", "student_id"}
             )
         }
 )
@@ -30,18 +30,9 @@ public class Application {
     @JoinColumn(name = "job_id", nullable = false)
     private JobListing jobListing;
 
-    @Column(nullable = false)
-    private String studentName;
-
-    @Column(name = "student_email",nullable = false)
-    private String studentEmail;
-
-    @Column(nullable = false)
-    private String uid;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Department department;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id", nullable = false)
+    private User student;
 
     @Column(nullable = false)
     private double cgpa;

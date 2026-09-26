@@ -5,6 +5,7 @@ import com.racker.CampusHire.dto.request.StatusUpdateReq;
 import com.racker.CampusHire.dto.response.ApplicationRes;
 import com.racker.CampusHire.entity.ApplicationStatus;
 import com.racker.CampusHire.service.ApplicationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class ApplicationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApplicationRes applyForJob(@RequestBody ApplicationReq applicationReq, Principal principal) {
+    public ApplicationRes applyForJob(@Valid @RequestBody ApplicationReq applicationReq, Principal principal) {
         return applicationService.applyForJob(applicationReq, principal.getName());
     }
 
@@ -43,7 +44,7 @@ public class ApplicationController {
     @ResponseStatus(HttpStatus.OK)
     public ApplicationRes updateStatus(
         @PathVariable Long id,
-        @RequestBody StatusUpdateReq statusUpdateReq) {
+        @Valid@RequestBody StatusUpdateReq statusUpdateReq) {
         return  applicationService.updateStatus(id, statusUpdateReq);
     }
 }

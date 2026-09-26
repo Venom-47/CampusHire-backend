@@ -9,11 +9,10 @@ import java.util.List;
 
 public interface ApplicationRepo extends JpaRepository<Application, Long> {
 
-    boolean existsByJobListingIdAndStudentEmail(Long jobId, String studentEmail);
+    boolean existsByJobListingIdAndStudentEmail(Long jobId, Long studentId);
 
     List<Application> findByJobListingId(Long jobListingId);
 
     List<Application> findByStudentEmailIgnoreCase(String studentEmail);
 
-    List<Application> findByStatus(Application status);
 }

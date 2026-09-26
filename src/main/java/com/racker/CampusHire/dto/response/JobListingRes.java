@@ -23,5 +23,7 @@ public class JobListingRes {
     private String status;
     private String location;
     private String description;
+    private String postedByName;
+    private String postedByEmail;
     private LocalDateTime createdAt;
 }

@@ -1,5 +1,7 @@
 package com.racker.CampusHire.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -9,12 +11,9 @@ import lombok.*;
 @Builder
 public class ApplicationReq {
 
+    @NotNull(message = "Job ID is required")
     private Long jobId;
-    private String studentName;
-    private String studentEmail;
-    private String uid;
-    private String department;
-    private double cgpa;
-    private String resumeUrl;
 
+    @NotBlank(message = "Resume URL is required")
+    private String resumeUrl;
 }

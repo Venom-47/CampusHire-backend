@@ -37,10 +37,10 @@ public class ApplicationServiceImpl implements ApplicationService {
     @Override
     public ApplicationRes applyForJob(ApplicationReq req, String studentEmail) {
 
-        log.info("Student {} ({}) applying for Job id: {}",req.getStudentName(),studentEmail,req.getJobId());
+        log.info("Student {} applying for Job id: {}",studentEmail,req.getJobId());
 
         User user = userRepo.findByEmail(studentEmail)
-            .orElseThrow(() -> new ResourceNotFoundException("User not found with name: " + studentEmail));
+            .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + studentEmail));
 
         if(user.getCgpa() == null){
             throw new IneligibleStudentException("Your profile does not have a registered CGPA. Please contact TPO.");
@@ -60,8 +60,8 @@ public class ApplicationServiceImpl implements ApplicationService {
             throw new DeadlinePassedException("The deadline for this job was: " + job.getDeadline());
         }
 
-        if(applicationRepo.existsByJobListingIdAndStudentEmail(req.getJobId(), studentEmail)) {
-            log.warn("Application rejected: Duplicate application by {} for job id: {}", user.getFullName(), req.getJobId());
+        if(applicationRepo.existsByJobListingIdAndStudentEmail(req.getJobId(), user.getId())) {
+            log.warn("Application rejected: Duplicate application by {} for job id: {}", user.getEmail(), req.getJobId());
 
             throw new DuplicateApplicationException("You have already applied for this job.");
         }
@@ -76,10 +76,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 
         Application application = Application.builder()
             .jobListing(job)
-            .studentName(user.getFullName())
-            .studentEmail(user.getEmail())
-            .uid(user.getUid())
-            .department(user.getDepartment())
+            .student(user)
             .cgpa(user.getCgpa())
             .status(ApplicationStatus.APPLIED)
             .resumeUrl(req.getResumeUrl())
@@ -129,10 +126,10 @@ public class ApplicationServiceImpl implements ApplicationService {
             .jobId(application.getJobListing().getId())
             .companyName(application.getJobListing().getCompanyName())
             .roleTitle(application.getJobListing().getRoleTitle())
-            .studentName(application.getStudentName())
-            .studentEmail(application.getStudentEmail())
-            .uid(application.getUid())
-            .department(application.getDepartment())
+            .studentName(application.getStudent().getFullName())
+            .studentEmail(application.getStudent().getEmail())
+            .uid(application.getStudent().getUid())
+            .department(application.getStudent().getDepartment())
             .cgpa(application.getCgpa())
             .status(application.getStatus())
             .resumeUrl(application.getResumeUrl())

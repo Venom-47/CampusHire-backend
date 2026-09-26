@@ -3,10 +3,12 @@ package com.racker.CampusHire.controller;
 import com.racker.CampusHire.dto.request.JobListingReq;
 import com.racker.CampusHire.dto.response.JobListingRes;
 import com.racker.CampusHire.service.JobListingService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -19,8 +21,8 @@ public class JobListingController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public JobListingRes createJob(@RequestBody JobListingReq req) {
-        return jobListingService.createJob(req);
+    public JobListingRes createJob(@Valid @RequestBody JobListingReq req, Principal principal) {
+        return jobListingService.createJob(req, principal.getName());
     }
 
     @GetMapping("/{id}")
